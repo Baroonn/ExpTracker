@@ -32,7 +32,7 @@ namespace ExpTracker.Controllers
                 to = DateTime.Now;
             }
             var user = await GetUserAsync();
-            return View(await _context.Expenses.Where(x => x.User == user && from <= x.Date && to >= x.Date).ToListAsync());
+            return View(await _context.Expenses.Where(x => x.User == user && from <= x.Date && to >= x.Date).Include(x => x.Category).ToListAsync());
         }
 
         // GET: Expenses/Details/5
@@ -45,6 +45,7 @@ namespace ExpTracker.Controllers
             }
 
             var expense = await _context.Expenses.Where(e => e.Id == id && e.User == user)
+                .Include(x => x.Category)
                 .FirstOrDefaultAsync();
             if (expense == null)
             {
@@ -108,8 +109,12 @@ namespace ExpTracker.Controllers
                 return NotFound();
             }
             var categories = _context.Categories.Where(x => x.User == user).ToList();
+            
+            var selectList = new SelectList(categories.Where(x => x.Id != expense.Category?.Id), "Id", "Name", expense.Category?.Id.ToString()).ToList();
+            
+            selectList.Insert(0, new SelectListItem { Text = expense.Category?.Name, Value = expense.Category?.Id.ToString(), Selected = true });
 
-            ViewBag.Categories = new SelectList(categories, "Id", "Name", "3");
+            ViewBag.Categories = selectList;
             
             return View(expense);
         }
@@ -168,6 +173,7 @@ namespace ExpTracker.Controllers
             }
 
             var expense = await _context.Expenses.Where(x => x.Id == id && x.User == user)
+                .Include(x => x.Category)
                 .FirstOrDefaultAsync();
             if (expense == null)
             {

@@ -13,5 +13,10 @@ namespace ExpTracker.Models
         public AppUser? User { get; set; }
         public ICollection<Expense>? Expenses { get; set; }
 
+        public override string ToString()
+        {
+            return Name;
+        }
+
     }
 }
