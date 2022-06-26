@@ -108,10 +108,15 @@ namespace ExpTracker.Controllers
             {
                 return NotFound();
             }
-            var categories = _context.Categories.Where(x => x.User == user).ToList();
+            var categories = _context.Categories
+                .Where(x => x.User == user)
+                .ToList();
             
-            var selectList = new SelectList(categories.Where(x => x.Id != expense.Category?.Id), "Id", "Name", expense.Category?.Id.ToString()).ToList();
+            var selectList = new SelectList(categories
+                .Where(x => x.Id != expense.Category?.Id), "Id", "Name", expense.Category?.Id.ToString())
+                .ToList();
             
+            //Select the current category
             selectList.Insert(0, new SelectListItem { Text = expense.Category?.Name, Value = expense.Category?.Id.ToString(), Selected = true });
 
             ViewBag.Categories = selectList;
